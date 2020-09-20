@@ -7,6 +7,8 @@
 // 引入需要的工具包
 const sp = require('superagent');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
 
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
@@ -25,7 +27,19 @@ let books = [];
 // 1. 发送请求，获取HTML字符串
 (async () => {
 
-    pageLoader(BASE_URL);
+    await pageLoader(BASE_URL);
+
+    console.log('books: ', books);
+
+    var file = path.join(__dirname, 'test.json'); 
+    var content = JSON.stringify(books);
+    
+    fs.writeFile(file, content, function(err) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log('文件创建成功，地址：' + file);
+    });
 
     // let html = await sp.get(BASE_URL);
   
@@ -78,6 +92,12 @@ async function pageLoader(url) {
     }
     else {
         console.log('books: ', books)
+        for (let i = 0; i < books.length; i++) {
+            await jobLoader(books[i].link, i);
+            if (i === books.length - 1) {
+                break;
+            }
+        }
         return books;
     }
 }
@@ -87,13 +107,16 @@ function getJobInfo($, t) {
     const name = $(t).find('a').eq(0).text();
     const companyName = $(t).find('a').eq(1).text();
     const time = $(t).find('span.Eadjc1o').eq(0).text();
+    const location = $(t).find('div.xxz8a1h span._3FrNV7v._3PZrylH.E6m4BZb a._3AMdmRg').eq(0).text();
+    const area = $(t).find('div.xxz8a1h span._3FrNV7v._3PZrylH.E6m4BZb a._3AMdmRg').eq(1).text();
     if (link && link.substring(0,4) === '/job') {
         let info = {
-            link: link,
+            link: 'https://www.seek.co.nz' + link,
             name: name,
-            companyName: companyName,
+            companyName: companyName, 
             time: time,
-            // image: $(this).find('img').attr('src')
+            location: location,
+            area: area
         }
         return info;
     }
@@ -101,3 +124,41 @@ function getJobInfo($, t) {
         return null;
     }
 }
+
+async function jobLoader(url, index) {
+    let html = await sp.get(url);
+  
+    // 2. 将字符串导入，使用cheerio获取元素
+    let $ = cheerio.load(html.text);
+    
+    // 3. 获取指定的元素
+    $('.Ne1m3o8').each(function () {
+        if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
+            const email = $(this).eq(0).attr('href').split(':')[1];
+            if (email) {
+                books[index].email = email;
+            }
+            else {
+                books[index].email = null;
+            }
+        }
+    })
+    return books;
+}
+
+
+/* 
+ 添加行到文件
+ */
+function appendLine(file, line) {
+    return new Observable(subscriber => {
+      fs.appendFile(file, line + '\n', err => {
+        if (err) {
+          subscriber.error(err);
+        } else {
+          subscriber.next(line);
+          subscriber.complete();
+        }
+      });
+    });
+  }
