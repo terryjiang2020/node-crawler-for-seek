@@ -14,7 +14,7 @@ const path = require('path');
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
 const keywords = 'developer';
-const BASE_URL = 'https://au.indeed.com/jobs?q=' + keywords + '&l=';
+const BASE_URL = 'https://www.monsterindia.com/srp/results?query=' + keywords + '&l=';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
 //     'User-Agent':'Mozilla/5.0',
@@ -65,7 +65,7 @@ async function pageLoader(url) {
         console.log('next page exists');
         console.log(`$('.pagination-list li').eq(-1): `, $('.pagination-list li').eq(-1));
         console.log('href="', $('.pagination-list li').eq(-1).find('a').attr('href'), '"');
-        const next = 'https://au.indeed.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
+        const next = 'https://www.monsterindia.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
         return pageLoader(next);
     }
     else {
@@ -89,7 +89,7 @@ function getJobInfo($, t) {
     const area = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[0];
     if (link) {
         let info = {
-            link: 'https://au.indeed.com' + link,
+            link: 'https://www.monsterindia.com' + link,
             name: name,
             companyName: companyName, 
             time: time,
