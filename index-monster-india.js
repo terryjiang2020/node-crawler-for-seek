@@ -82,6 +82,7 @@ function wait(ms) {
     const page = await browser.newPage()
     await page.goto(BASE_URL, {
         waitUntil: 'networkidle2',
+        timeout: 0
     }) // your url here
 
     // Get the height of the rendered page
@@ -126,10 +127,12 @@ function wait(ms) {
             result = result.concat(result_n);
         }
 
+        console.log('result.length: ', result.length);
         BASE_URL = BASE_URL.replace('start=' + currentJobCount.toString(), 'start=' + (currentJobCount + 100).toString());
         currentJobCount = currentJobCount + 100;
         await page.goto(BASE_URL, {
             waitUntil: 'networkidle2',
+            timeout: 0
         }) // your url here
     }
 
@@ -251,7 +254,7 @@ async function getJobInfo(page) {
         }
     }
     
-    console.log('result: ', result);
+    console.log('result.length: ', result.length);
     // get all jobs in the current page END 
 
     // check if next page exists START 
