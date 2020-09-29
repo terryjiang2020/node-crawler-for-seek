@@ -7,6 +7,8 @@
 // 引入需要的工具包
 const sp = require('superagent');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
+const request = require('request');
 const fs = require('fs');
 const path = require('path');
 
@@ -14,7 +16,7 @@ const path = require('path');
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
 const keywords = 'programmer';
-const BASE_URL = 'https://www.monsterindia.com/srp/results?query=' + keywords;
+var BASE_URL = 'https://www.monsterindia.com/srp/results?start=0&sort=2&limit=100&query=' + keywords;
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
 //     'User-Agent':'Mozilla/5.0',
@@ -24,123 +26,240 @@ const BASE_URL = 'https://www.monsterindia.com/srp/results?query=' + keywords;
 // }
 
 let jobs = [];
-// 1. 发送请求，获取HTML字符串
-(async () => {
+// 下載圖片
+var download = function(uri, filename, callback) {
+    request.head(uri, function(err, res, body) {
+        request(uri)
+            .pipe(fs.createWriteStream(__dirname + `/${filename}`))
+            .on('close', function() {
+                console.log('Finished Copy Images')
+            })
+    })
+}
 
-    await pageLoader(BASE_URL);
+// 等一下
+function wait(ms) {
+    return new Promise(resolve => setTimeout(() => resolve(), ms))
+}
 
-    console.log('jobs: ', jobs);
+// 爬所有圖片網址
+// ;(async () => {
+//     const browser = await puppeteer.launch({
+//         headless: false,
+//         slowMo: 100,
+//     })
+//     const page = await browser.newPage()
+//     await page.goto(BASE_URL, {
+//         waitUntil: 'domcontentloaded',
+//     }) // your url here
 
-    var file = path.join(__dirname, 'test.json'); 
-    var content = JSON.stringify(jobs);
+//     // Some extra delay to let images load
+//     await wait(5000)
+
+//     let jobCards = await page.evaluate(() => {
+//         const jobCards = Array.from(document.querySelectorAll('div.card-panel.apply-panel.job-apply-card'));
+//         return jobCards;
+//     })
+
+//     console.log('jobCards: ', jobCards);
+
+//     jobCards.forEach((element, index) => {
+//             console.log('element: ', element);
+//             console.log('index: ', index);
+//         }
+//     )
+
+//     // await browser.close()
+// })()
+
+
+// 爬所有圖片網址
+;(async () => {
+    const browser = await puppeteer.launch({
+        headless: false,
+        slowMo: 100,
+    })
+    const page = await browser.newPage()
+    await page.goto(BASE_URL, {
+        waitUntil: 'networkidle2',
+    }) // your url here
+
+    // Get the height of the rendered page
+    const bodyHandle = await page.$('body')
+    const { height } = await bodyHandle.boundingBox()
+    await bodyHandle.dispose()
     
-    fs.writeFile(file, content, function(err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log('文件创建成功，地址：' + file);
-    });
+    const elements = await page.$$('.col-lg-3 .main-heading');
+    const searchResultText = await (await elements[0].getProperty('innerHTML')).jsonValue();
+    console.log('searchResultText: ', searchResultText);
+    const jobNumber = parseInt(searchResultText.replace('Search Results - ', ''));
+    var currentJobCount = 0;
+    console.log('jobNumber: ', jobNumber);
+    var result;
 
+    while (currentJobCount < jobNumber  && currentJobCount < 9600) {
+
+        // Scroll one viewport at a time, pausing to let content load
+        // const viewportHeight = page.viewport().height
+        // let viewportIncr = 0
+        // while (viewportIncr + viewportHeight < height) {
+        //     await page.evaluate(_viewportHeight => {
+        //         window.scrollBy(0, _viewportHeight)
+        //     }, viewportHeight)
+        //     await wait(20)
+        //     viewportIncr = viewportIncr + viewportHeight
+        // }
+    
+        // // Scroll back to top
+        // await page.evaluate(_ => {
+        //     window.scrollTo(0, 0)
+        // })
+    
+        // Some extra delay to let images load
+        await wait(1000)
+    
+        if (!result) {
+            result = await getJobInfo(page);
+        }
+        else {
+            const result_n = await getJobInfo(page);
+            result = result.concat(result_n);
+        }
+
+        BASE_URL = BASE_URL.replace('start=' + currentJobCount.toString(), 'start=' + (currentJobCount + 100).toString());
+        currentJobCount = currentJobCount + 100;
+        await page.goto(BASE_URL, {
+            waitUntil: 'networkidle2',
+        }) // your url here
+    }
+
+    // while (await page.evaluate(() => {
+    //     Array.from(document.querySelectorAll('.btn-next-prev')).length !== 0;
+    // })) {
+    //     console.log('next page exists');
+    // }
+    
+    console.log('result.length: ', result.length);
+    
+    await browser.close();
 })()
 
-async function pageLoader(url) {
-    let html = await sp.get(url);
-  
-    // 2. 将字符串导入，使用cheerio获取元素
-    let $ = cheerio.load(html.text);
+async function getJobInfo(page) {
 
-    console.log('$: ', $);
-    
-    console.log('length1: ', $('.card-panel').length);
-
-    // 3. 获取指定的元素
-    $('div#srp-right-part div.srp-right-part > div.srp-left > div div.row').eq(1).find('div.col-md-12 div').each(function () {
-        console.log('element caught');
-        const info = getJobInfo($, this);
-        if (info !== null) {
-            jobs.push(info);
-        }
-    })
-
-    if (
-        $('.pagination-list li').eq(-1) && 
-        $('.pagination-list li').eq(-1).length !== 0 && 
-        $('.pagination-list li').eq(-1).find('a').attr('href')) {
-        console.log('next page exists');
-        console.log(`$('.pagination-list li').eq(-1): `, $('.pagination-list li').eq(-1));
-        console.log('href="', $('.pagination-list li').eq(-1).find('a').attr('href'), '"');
-        const next = 'https://www.monsterindia.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
-        return pageLoader(next);
+    // get all jobs in the current page START
+    async function infos() {
+        return await page.evaluate(() => {
+            const jobTitles = Array.from(document.querySelectorAll('div.job-tittle h3.medium a'));
+            // const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name a.under-link'));
+            const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name')).map(span => {
+                if (span.firstChild) {
+                    if (span.firstChild.innerHTML) {
+                        return span.firstChild.innerHTML;
+                    }
+                    else {
+                        return span.innerHTML;
+                    }
+                }
+                else {
+                    return 'Company Name Confidential';
+                }
+            });
+            const locations = Array.from(document.querySelectorAll('span.loc small')).filter(small => !small.innerHTML.includes('<') && !small.innerHTML.includes('INR') && !small.innerHTML.includes('Not')).map(small => small.innerHTML.replace('\n                                ', '').replace('\n                            ', ''));
+            const times = Array.from(document.querySelectorAll('span.posted')).filter(span => !span.innerHTML.includes('|')).map(time => time.innerHTML.replace('\n                Posted: ', '').replace('\n            ', ''));
+            const links = jobTitles.map(a => a.href);
+            const names = jobTitles.map(a => a.innerHTML);
+            const res = {
+                companyNames: companyNames, 
+                locations: locations,
+                times: times, 
+                links: links,
+                names: names,
+            };
+            // var nextPageBtns = Array.from(document.querySelectorAll('.btn-next-prev'));
+            // var nextPageBtnIndex = nextPageBtns.findIndex(e => e.innerHTML.includes('Next'));
+            // var nextPageExists = nextPageBtnIndex !== -1;
+            // if (nextPageExists) {
+            //     page.click(nextPageBtns[nextPageBtnIndex]);
+            //     const jobTitles = Array.from(document.querySelectorAll('div.job-tittle h3.medium a'));
+            //     // const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name a.under-link'));
+            //     const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name')).map(span => {
+            //         if (span.firstChild) {
+            //             if (span.firstChild.innerHTML) {
+            //                 return span.firstChild.innerHTML;
+            //             }
+            //             else {
+            //                 return span.innerHTML;
+            //             }
+            //         }
+            //         else {
+            //             return 'Company Name Confidential';
+            //         }
+            //     });
+            //     const locations = Array.from(document.querySelectorAll('span.loc small')).filter(small => !small.innerHTML.includes('<') && !small.innerHTML.includes('INR') && !small.innerHTML.includes('Not')).map(small => small.innerHTML.replace('\n                                ', '').replace('\n                            ', ''));
+            //     const times = Array.from(document.querySelectorAll('span.posted')).filter(span => !span.innerHTML.includes('|')).map(time => time.innerHTML.replace('\n                Posted: ', '').replace('\n            ', ''));
+            //     const links = jobTitles.map(a => a.href);
+            //     const names = jobTitles.map(a => a.innerHTML);
+            //     const res = {
+            //         companyNames: companyNames, 
+            //         locations: locations,
+            //         times: times, 
+            //         links: links,
+            //         names: names,
+            //     };
+            //     var nextPageBtns = Array.from(document.querySelectorAll('.btn-next-prev'));
+            //     var nextPageBtnIndex = nextPageBtns.findIndex(e => e.innerHTML.includes('Next'));
+            //     var nextPageExists = nextPageBtnIndex !== -1;
+            // }
+            
+            // return result;
+            return res;
+        })
     }
-    else {
-        console.log('jobs: ', jobs)
-        for (let i = 0; i < jobs.length; i++) {
-            await jobLoader(jobs[i].link, i);
-            if (i === jobs.length - 1) {
+
+    const info = await infos();
+
+    console.log('info: ', info);
+    console.log('info.companyNames.length: ', info.companyNames.length);
+    console.log('info.locations.length: ', info.locations.length);
+    console.log('info.times.length: ', info.times.length);
+    console.log('info.links.length: ', info.links.length);
+    console.log('info.names.length: ', info.names.length);
+
+    const result = [];
+    const condition = 
+    info.companyNames.length === 
+    info.locations.length && 
+    info.times.length === 
+    info.links.length && 
+    info.names.length === info.times.length && 
+    info.companyNames.length === info.names.length;
+    console.log('condition: ', condition);
+    if (condition) {
+        for (let i = 0; i < info.companyNames.length; i++) {
+            const res = {
+                link: info.links[i],
+                name: info.names[i],
+                companyName: info.companyNames[i], 
+                time: info.times[i],
+                location: info.locations[i],
+                area: null
+            }
+            result.push(res);
+            if (i === info.companyNames.length - 1) {
                 break;
             }
         }
-        return jobs;
     }
-}
-
-function getJobInfo($, t) {
-    const link = $(t).find('h2.title a.jobtitle').eq(0).attr('href');
-    const name = $(t).find('h2.title a.jobtitle').eq(0).text().replace(/\n/g, '');
-    const companyName = $(t).find('div.sjcl span.company').eq(0).text().replace(/\n/g, '');
-    const time = $(t).find('div.jobsearch-SerpJobCard-footer div.jobsearch-SerpJobCard-footerActions div.result-link-bar-container span.date').eq(0).text();
-    const location = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[1];
-    const area = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[0];
-    if (link) {
-        let info = {
-            link: 'https://www.monsterindia.com' + link,
-            name: name,
-            companyName: companyName, 
-            time: time,
-            location: location,
-            area: area
-        }
-        return info;
-    }
-    else {
-        return null;
-    }
-}
-
-async function jobLoader(url, index) {
-    let html = await sp.get(url);
-  
-    // 2. 将字符串导入，使用cheerio获取元素
-    let $ = cheerio.load(html.text);
     
-    // 3. 获取指定的元素
-    $('.Ne1m3o8').each(function () {
-        if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
-            const email = $(this).eq(0).attr('href').split(':')[1];
-            if (email) {
-                jobs[index].email = email;
-            }
-            else {
-                jobs[index].email = null;
-            }
-        }
+    console.log('result: ', result);
+    // get all jobs in the current page END 
+
+    // check if next page exists START 
+    await page.evaluate(() => {
+        const length = Array.from(document.querySelectorAll('.btn-next-prev')).length !== 0;
+        console.log('length: ', length);
     })
-    return jobs;
+    // check if next page exists END
+
+     return result;
 }
-
-
-/* 
- 添加行到文件
- */
-function appendLine(file, line) {
-    return new Observable(subscriber => {
-      fs.appendFile(file, line + '\n', err => {
-        if (err) {
-          subscriber.error(err);
-        } else {
-          subscriber.next(line);
-          subscriber.complete();
-        }
-      });
-    });
-  }
