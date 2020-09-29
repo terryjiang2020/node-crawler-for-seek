@@ -13,8 +13,8 @@ const path = require('path');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'developer';
-const BASE_URL = 'https://www.monsterindia.com/srp/results?query=' + keywords + '&l=';
+const keywords = 'programmer';
+const BASE_URL = 'https://www.monsterindia.com/srp/results?query=' + keywords;
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
 //     'User-Agent':'Mozilla/5.0',
@@ -48,9 +48,13 @@ async function pageLoader(url) {
   
     // 2. 将字符串导入，使用cheerio获取元素
     let $ = cheerio.load(html.text);
+
+    console.log('$: ', $);
     
+    console.log('length1: ', $('.card-panel').length);
+
     // 3. 获取指定的元素
-    $('#resultsCol div.jobsearch-SerpJobCard').each(function () {
+    $('div#srp-right-part div.srp-right-part > div.srp-left > div div.row').eq(1).find('div.col-md-12 div').each(function () {
         console.log('element caught');
         const info = getJobInfo($, this);
         if (info !== null) {
