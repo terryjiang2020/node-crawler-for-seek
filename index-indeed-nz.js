@@ -14,7 +14,7 @@ const path = require('path');
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
 const keywords = 'developer';
-const BASE_URL = 'https://nz.indeed.com/jobs?q=' + keywords + '&l=';
+const BASE_URL = 'https://nz.indeed.com/jobs?q=' + keywords + '&fromage=14';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
 //     'User-Agent':'Mozilla/5.0',
