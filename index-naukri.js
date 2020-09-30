@@ -204,7 +204,8 @@ async function getJobInfo(page) {
                 companyName: info.companyNames[i], 
                 time: info.times[i],
                 location: info.locations[i],
-                area: null
+                area: null, 
+                country: 'India'
             }
             result.push(res);
             if (i === info.companyNames.length - 1) {

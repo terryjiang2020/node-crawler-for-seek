@@ -94,7 +94,8 @@ function getJobInfo($, t) {
             companyName: companyName, 
             time: time,
             location: location,
-            area: area
+            area: area,
+            country: 'New Zealand'
         }
         return info;
     }
