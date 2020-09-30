@@ -98,7 +98,7 @@ function wait(ms) {
     console.log('jobNumber: ', jobNumber);
     var result;
 
-    while (currentJobCount < jobNumber  && currentJobCount < 100) {
+    while (currentJobCount < jobNumber && currentJobCount < 9000) {
 
         // Scroll one viewport at a time, pausing to let content load
         // const viewportHeight = page.viewport().height
