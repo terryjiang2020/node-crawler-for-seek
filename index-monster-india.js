@@ -98,7 +98,7 @@ function wait(ms) {
     console.log('jobNumber: ', jobNumber);
     var result;
 
-    while (currentJobCount < jobNumber  && currentJobCount < 9600) {
+    while (currentJobCount < jobNumber  && currentJobCount < 100) {
 
         // Scroll one viewport at a time, pausing to let content load
         // const viewportHeight = page.viewport().height
@@ -136,16 +136,42 @@ function wait(ms) {
         }) // your url here
     }
 
-    // while (await page.evaluate(() => {
-    //     Array.from(document.querySelectorAll('.btn-next-prev')).length !== 0;
-    // })) {
-    //     console.log('next page exists');
-    // }
+    while (await page.evaluate(() => {
+        Array.from(document.querySelectorAll('.btn-next-prev')).length !== 0;
+    })) {
+        console.log('next page exists');
+    }
+
+    if (result.length !== 0) {
+        for (let j = 0; j < result.length; j++) {
+            await page.goto(result[j].link, {
+                waitUntil: 'networkidle2',
+                timeout: 0
+            }) // your url here
+
+
+            result = getJobDetail(page, result, j);
+
+            if (j === result.length - 1) {
+                break;
+            }
+        }
+    }
     
     console.log('result.length: ', result.length);
+    console.log('result[0]: ', result[0]);
     
-    await browser.close();
+    // await browser.close();
 })()
+
+async function getJobDetail(page, result, index) {
+    return await page.evaluate(() => {
+        const description = Array.from(document.querySelectorAll('p.jd-text')).map(p => p.innerHTML)[0];
+        result[index].description = description;
+        console.log('description: ', description);
+        return result;
+    })
+}
 
 async function getJobInfo(page) {
 
@@ -265,5 +291,5 @@ async function getJobInfo(page) {
     })
     // check if next page exists END
 
-     return result;
+    return result;
 }
