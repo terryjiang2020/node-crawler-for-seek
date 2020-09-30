@@ -141,16 +141,21 @@ function wait(ms) {
     })) {
         console.log('next page exists');
     }
+    
+    console.log('result.length: ', result.length);
+    console.log('result[0]: ', result[0]);
 
     if (result.length !== 0) {
+        console.log('result.length: ', result.length);
         for (let j = 0; j < result.length; j++) {
             await page.goto(result[j].link, {
                 waitUntil: 'networkidle2',
                 timeout: 0
             }) // your url here
 
+            const e_result = await getJobDetail(page, result, j);
 
-            result = getJobDetail(page, result, j);
+            result[j].description = e_result;
 
             if (j === result.length - 1) {
                 break;
@@ -158,18 +163,20 @@ function wait(ms) {
         }
     }
     
-    console.log('result.length: ', result.length);
-    console.log('result[0]: ', result[0]);
+    console.log('result: ', result);
+    // console.log('result[0]: ', result[0]);
     
     // await browser.close();
 })()
 
-async function getJobDetail(page, result, index) {
+async function getJobDetail(page) {
+    console.log('getJobDetail is triggered');
     return await page.evaluate(() => {
         const description = Array.from(document.querySelectorAll('p.jd-text')).map(p => p.innerHTML)[0];
-        result[index].description = description;
         console.log('description: ', description);
-        return result;
+        // result[index].description = description;
+        // console.log('description: ', description);
+        return description;
     })
 }
 
