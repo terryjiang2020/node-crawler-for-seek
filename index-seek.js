@@ -63,7 +63,8 @@ async function pageLoader(url) {
         !(
             $('.bHpQ-bp').eq(0).attr('href') && 
             $('.bHpQ-bp').eq(0).attr('href').split('?').length > 1 && 
-            $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'page=200')
+            // $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'page=200')
+            $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'page=10')
         ) {
         console.log('next page exists');
         console.log(`$('.bHpQ-bp').eq(0).attr('href').split('?'): `, $('.bHpQ-bp').eq(0).attr('href').split('?'));
@@ -72,13 +73,13 @@ async function pageLoader(url) {
         return pageLoader(next);
     }
     else {
-        console.log('jobs: ', jobs)
         for (let i = 0; i < jobs.length; i++) {
             await jobLoader(jobs[i].link, i);
             if (i === jobs.length - 1) {
                 break;
             }
         }
+        console.log('jobs: ', jobs)
         return jobs;
     }
 }
@@ -125,6 +126,14 @@ async function jobLoader(url, index) {
             }
         }
     })
+
+    const description = $('div').data('automation', 'jobDescription').eq(0).text().trim();
+    if (description) {
+        jobs[index].description = description;
+    } else {
+        jobs[index].description = null;
+    }
+
     return jobs;
 }
 
