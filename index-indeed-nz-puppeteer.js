@@ -10,8 +10,8 @@ const puppeteer = require('puppeteer');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'react-js-jobs';
-var BASE_URL = 'https://www.naukri.com/' + keywords + '-0?industryTypeId=25&jobAge=15';
+const keywords = 'developer';
+const BASE_URL = 'https://nz.indeed.com/jobs?q=' + keywords + '&fromage=14';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
 //     'User-Agent':'Mozilla/5.0',

@@ -44,6 +44,7 @@ let jobs = [];
 })()
 
 async function pageLoader(url) {
+
     let html = await sp.get(url);
   
     // 2. 将字符串导入，使用cheerio获取元素
@@ -122,6 +123,11 @@ async function jobLoader(url, index) {
             }
         }
     })
+    jobs[index].description = $('#jobDescriptionText').eq(0).text().trim();
+
+    console.log('jobs[index].email: ', jobs[index].email);
+    console.log('jobs[index].description: ', jobs[index].description);
+
     return jobs;
 }
 
