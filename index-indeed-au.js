@@ -9,6 +9,7 @@ const sp = require('superagent');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const sleep = require('sleep');
 
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
@@ -44,6 +45,7 @@ let jobs = [];
 })()
 
 async function pageLoader(url) {
+
     let html = await sp.get(url);
   
     // 2. 将字符串导入，使用cheerio获取元素
@@ -65,12 +67,14 @@ async function pageLoader(url) {
         console.log('next page exists');
         console.log(`$('.pagination-list li').eq(-1): `, $('.pagination-list li').eq(-1));
         console.log('href="', $('.pagination-list li').eq(-1).find('a').attr('href'), '"');
-        const next = 'https://au.indeed.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
+        const next = 'https://nz.indeed.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
+        sleep.sleep(2);
         return pageLoader(next);
     }
     else {
         console.log('jobs: ', jobs)
         for (let i = 0; i < jobs.length; i++) {
+            sleep.sleep(2);
             await jobLoader(jobs[i].link, i);
             if (i === jobs.length - 1) {
                 break;
@@ -89,13 +93,13 @@ function getJobInfo($, t) {
     const area = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[0];
     if (link) {
         let info = {
-            link: 'https://au.indeed.com' + link,
+            link: 'https://nz.indeed.com' + link,
             name: name,
             companyName: companyName, 
             time: time,
             location: location,
             area: area,
-            country: 'Australia'
+            country: 'New Zealand'
         }
         return info;
     }
@@ -109,7 +113,7 @@ async function jobLoader(url, index) {
   
     // 2. 将字符串导入，使用cheerio获取元素
     let $ = cheerio.load(html.text);
-    
+        
     // 3. 获取指定的元素
     $('.Ne1m3o8').each(function () {
         if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
@@ -122,6 +126,11 @@ async function jobLoader(url, index) {
             }
         }
     })
+    jobs[index].description = $('#jobDescriptionText').eq(0).text().trim();
+
+    console.log('jobs[index].email: ', jobs[index].email);
+    console.log('jobs[index].description: ', jobs[index].description);
+
     return jobs;
 }
 

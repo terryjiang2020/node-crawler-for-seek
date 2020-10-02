@@ -106,70 +106,35 @@ async function getJobInfo(page) {
     // get all jobs in the current page START
     async function infos() {
         return await page.evaluate(() => {
-            const jobTitles = Array.from(document.querySelectorAll('.jobTupleHeader .info.fleft .title.fw500.ellipsis'));
-            // const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name a.under-link'));
-            const companyNames = Array.from(document.querySelectorAll('.mt-7.companyInfo.subheading.lh16 .subTitle.ellipsis.fleft')).map(span => {
-                if (span.firstChild) {
-                    if (span.firstChild.innerHTML) {
-                        return span.firstChild.innerHTML;
+            return setTimeout(() => {
+                const jobTitles = Array.from(document.querySelectorAll('.jobTupleHeader .info.fleft .title.fw500.ellipsis'));
+                // const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name a.under-link'));
+                const companyNames = Array.from(document.querySelectorAll('.mt-7.companyInfo.subheading.lh16 .subTitle.ellipsis.fleft')).map(span => {
+                    if (span.firstChild) {
+                        if (span.firstChild.innerHTML) {
+                            return span.firstChild.innerHTML;
+                        }
+                        else {
+                            return span.innerHTML;
+                        }
                     }
                     else {
-                        return span.innerHTML;
+                        return 'Company Name Confidential';
                     }
-                }
-                else {
-                    return 'Company Name Confidential';
-                }
-            });
-            const locations = Array.from(document.querySelectorAll('.fleft.grey-text.br2.placeHolderLi.location .ellipsis.fleft.fs12.lh16')).map(small => small.innerHTML);
-            const times = Array.from(document.querySelectorAll('.jobTupleFooter.mt-20 .type.br2.fleft span.fleft.fw500')).filter(span => span.innerHTML.includes('Ago') || span.innerHTML.includes('Now') || span.innerHTML.includes('Today')).map(span => span.innerHTML);
-            const links = jobTitles.map(a => a.href);
-            const names = jobTitles.map(a => a.innerHTML);
-            const res = {
-                companyNames: companyNames, 
-                locations: locations,
-                times: times, 
-                links: links,
-                names: names,
-            };
-            // var nextPageBtns = Array.from(document.querySelectorAll('.btn-next-prev'));
-            // var nextPageBtnIndex = nextPageBtns.findIndex(e => e.innerHTML.includes('Next'));
-            // var nextPageExists = nextPageBtnIndex !== -1;
-            // if (nextPageExists) {
-            //     page.click(nextPageBtns[nextPageBtnIndex]);
-            //     const jobTitles = Array.from(document.querySelectorAll('div.job-tittle h3.medium a'));
-            //     // const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name a.under-link'));
-            //     const companyNames = Array.from(document.querySelectorAll('div.job-tittle span.company-name')).map(span => {
-            //         if (span.firstChild) {
-            //             if (span.firstChild.innerHTML) {
-            //                 return span.firstChild.innerHTML;
-            //             }
-            //             else {
-            //                 return span.innerHTML;
-            //             }
-            //         }
-            //         else {
-            //             return 'Company Name Confidential';
-            //         }
-            //     });
-            //     const locations = Array.from(document.querySelectorAll('span.loc small')).filter(small => !small.innerHTML.includes('<') && !small.innerHTML.includes('INR') && !small.innerHTML.includes('Not')).map(small => small.innerHTML.replace('\n                                ', '').replace('\n                            ', ''));
-            //     const times = Array.from(document.querySelectorAll('span.posted')).filter(span => !span.innerHTML.includes('|')).map(time => time.innerHTML.replace('\n                Posted: ', '').replace('\n            ', ''));
-            //     const links = jobTitles.map(a => a.href);
-            //     const names = jobTitles.map(a => a.innerHTML);
-            //     const res = {
-            //         companyNames: companyNames, 
-            //         locations: locations,
-            //         times: times, 
-            //         links: links,
-            //         names: names,
-            //     };
-            //     var nextPageBtns = Array.from(document.querySelectorAll('.btn-next-prev'));
-            //     var nextPageBtnIndex = nextPageBtns.findIndex(e => e.innerHTML.includes('Next'));
-            //     var nextPageExists = nextPageBtnIndex !== -1;
-            // }
-            
-            // return result;
-            return res;
+                });
+                const locations = Array.from(document.querySelectorAll('.fleft.grey-text.br2.placeHolderLi.location .ellipsis.fleft.fs12.lh16')).map(small => small.innerHTML);
+                const times = Array.from(document.querySelectorAll('.jobTupleFooter.mt-20 .type.br2.fleft span.fleft.fw500')).filter(span => span.innerHTML.includes('Ago') || span.innerHTML.includes('Now') || span.innerHTML.includes('Today')).map(span => span.innerHTML);
+                const links = jobTitles.map(a => a.href);
+                const names = jobTitles.map(a => a.innerHTML);
+                const res = {
+                    companyNames: companyNames, 
+                    locations: locations,
+                    times: times, 
+                    links: links,
+                    names: names,
+                };
+                return res;
+            })
         })
     }
 

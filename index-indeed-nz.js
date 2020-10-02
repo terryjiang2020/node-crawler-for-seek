@@ -9,6 +9,7 @@ const sp = require('superagent');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const sleep = require('sleep');
 
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
@@ -67,11 +68,13 @@ async function pageLoader(url) {
         console.log(`$('.pagination-list li').eq(-1): `, $('.pagination-list li').eq(-1));
         console.log('href="', $('.pagination-list li').eq(-1).find('a').attr('href'), '"');
         const next = 'https://nz.indeed.com' + $('.pagination-list li').eq(-1).find('a').attr('href');
+        sleep.sleep(2);
         return pageLoader(next);
     }
     else {
         console.log('jobs: ', jobs)
         for (let i = 0; i < jobs.length; i++) {
+            sleep.sleep(2);
             await jobLoader(jobs[i].link, i);
             if (i === jobs.length - 1) {
                 break;
@@ -110,7 +113,7 @@ async function jobLoader(url, index) {
   
     // 2. 将字符串导入，使用cheerio获取元素
     let $ = cheerio.load(html.text);
-    
+        
     // 3. 获取指定的元素
     $('.Ne1m3o8').each(function () {
         if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
