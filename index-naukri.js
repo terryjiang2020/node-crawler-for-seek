@@ -47,7 +47,8 @@ function wait(ms) {
     const elements = await page.$$('.fleft.grey-text.mr-5.fs12');
     const searchResultText = await (await elements[0].getProperty('innerHTML')).jsonValue();
     console.log('searchResultText: ', searchResultText);
-    const jobNumber = parseInt(searchResultText.replace('1 - 20 of ', ''));
+    // const jobNumber = parseInt(searchResultText.replace('1 - 20 of ', ''));
+    const jobNumber = 50
     var currentJobCount = 0;
     console.log('jobNumber: ', jobNumber);
     var result;
@@ -82,8 +83,8 @@ function wait(ms) {
         }
 
         console.log('result.length: ', result.length);
-        BASE_URL = BASE_URL.replace('-' + currentJobCount.toString(), '-' + (currentJobCount + 1).toString());
-        currentJobCount = currentJobCount + 1;
+        BASE_URL = BASE_URL.replace('-' + currentJobCount.toString(), '-' + (currentJobCount + 20).toString());
+        currentJobCount = currentJobCount + 20;
         await page.goto(BASE_URL, {
             waitUntil: 'networkidle2',
             timeout: 0
@@ -97,9 +98,42 @@ function wait(ms) {
     // }
     
     console.log('result.length: ', result.length);
+    console.log('result[0]: ', result[0]);
+
+    if (result.length !== 0) {
+        console.log('result.length: ', result.length);
+        for (let j = 0; j < result.length; j++) {
+            await page.goto(result[j].link, {
+                waitUntil: 'networkidle2',
+                timeout: 0
+            }) // your url here
+
+            const e_result = await getJobDetail(page, result, j);
+
+            result[j].description = e_result;
+
+            if (j === result.length - 1) {
+                break;
+            }
+        }
+    }
+    
+    console.log('result: ', result);
+    // console.log('result[0]: ', result[0]);
     
     await browser.close();
 })()
+
+async function getJobDetail(page) {
+    console.log('getJobDetail is triggered');
+    return await page.evaluate(() => {
+        const description = Array.from(document.querySelectorAll('section.job-desc')).map(p => p.innerHTML)[0];
+        console.log('description: ', description);
+        // result[index].description = description;
+        // console.log('description: ', description);
+        return description;
+    })
+}
 
 async function getJobInfo(page) {
 
