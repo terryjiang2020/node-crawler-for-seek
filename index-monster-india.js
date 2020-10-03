@@ -13,7 +13,7 @@ const path = require('path');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'programmer';
+const keywords = 'React%20Js,Node%20Js';
 var BASE_URL = 'https://www.monsterindia.com/srp/results?start=0&sort=2&limit=100&query=' + keywords + '&jobFreshness=15&filter=true';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
