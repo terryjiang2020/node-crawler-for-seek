@@ -1,0 +1,30 @@
+{
+  "name": "crawler-for-seek",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000n\u0000o\u0000d\u0000e\u0000-\u0000c\u0000r\u0000a\u0000w\u0000l\u0000e\u0000r\u0000-\u0000f\u0000o\u0000r\u0000-\u0000s\u0000e\u0000e\u0000k\u0000\r\u0000 \u0000",
+  "main": "index-indeed-au.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "fs": "^0.0.1-security",
+    "puppeteer": "^5.3.1",
+    "querystring": "^0.2.0",
+    "request": "^2.88.2",
+    "rxjs": "^6.6.3",
+    "sleep": "^6.3.0",
+    "superagent": "^6.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terryjiang2020/node-crawler-for-seek.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/terryjiang2020/node-crawler-for-seek/issues"
+  },
+  "homepage": "https://github.com/terryjiang2020/node-crawler-for-seek#readme"
+}
