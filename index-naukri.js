@@ -7,6 +7,7 @@
 // 引入需要的工具包
 const puppeteer = require('puppeteer');
 
+const path = require('path');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
@@ -48,7 +49,7 @@ function wait(ms) {
     const searchResultText = await (await elements[0].getProperty('innerHTML')).jsonValue();
     console.log('searchResultText: ', searchResultText);
     // const jobNumber = parseInt(searchResultText.replace('1 - 20 of ', ''));
-    const jobNumber = 50
+    const jobNumber = 10
     var currentJobCount = 0;
     console.log('jobNumber: ', jobNumber);
     var result;

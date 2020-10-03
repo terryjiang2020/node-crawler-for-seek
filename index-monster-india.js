@@ -9,6 +9,7 @@ const puppeteer = require('puppeteer');
 const request = require('request');
 const fs = require('fs');
 
+const path = require('path');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
@@ -95,7 +96,7 @@ function wait(ms) {
     console.log('jobNumber: ', jobNumber);
     var result;
 
-    while (currentJobCount < jobNumber && currentJobCount < 500) {
+    while (currentJobCount < jobNumber && currentJobCount < 100) {
 
         // Scroll one viewport at a time, pausing to let content load
         // const viewportHeight = page.viewport().height
