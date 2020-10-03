@@ -9,6 +9,7 @@ const sp = require('superagent');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const test = require('./test');
 
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
@@ -31,7 +32,7 @@ let jobs = [];
 
     console.log('jobs: ', jobs);
 
-    var file = path.join(__dirname, 'test.json'); 
+    var file = path.join(__dirname, 'seek.json'); 
     var content = JSON.stringify(jobs);
     
     fs.writeFile(file, content, function(err) {
@@ -63,8 +64,8 @@ async function pageLoader(url) {
         !(
             $('.bHpQ-bp').eq(0).attr('href') && 
             $('.bHpQ-bp').eq(0).attr('href').split('?').length > 1 && 
-            // $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'page=200')
-            $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'page=10')
+            // $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'daterange=14&page=200')
+            $('.bHpQ-bp').eq(0).attr('href').split('?')[1] === 'daterange=14&page=100')
         ) {
         console.log('next page exists');
         console.log(`$('.bHpQ-bp').eq(0).attr('href').split('?'): `, $('.bHpQ-bp').eq(0).attr('href').split('?'));
@@ -79,7 +80,8 @@ async function pageLoader(url) {
                 break;
             }
         }
-        console.log('jobs: ', jobs)
+        // console.log('jobs: ', jobs);
+        // test.postJobs(jobs);
         return jobs;
     }
 }
@@ -127,7 +129,7 @@ async function jobLoader(url, index) {
         }
     })
 
-    const description = $('div').data('automation', 'jobDescription').eq(0).text().trim();
+    const description = $('div').data('automation', 'jobDescription').eq(0).html();
     if (description) {
         jobs[index].description = description;
     } else {

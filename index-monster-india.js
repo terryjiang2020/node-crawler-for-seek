@@ -5,12 +5,9 @@
  */
 
 // 引入需要的工具包
-const sp = require('superagent');
-const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const request = require('request');
 const fs = require('fs');
-const path = require('path');
 
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
@@ -98,7 +95,7 @@ function wait(ms) {
     console.log('jobNumber: ', jobNumber);
     var result;
 
-    while (currentJobCount < jobNumber && currentJobCount < 9000) {
+    while (currentJobCount < jobNumber && currentJobCount < 500) {
 
         // Scroll one viewport at a time, pausing to let content load
         // const viewportHeight = page.viewport().height
@@ -166,7 +163,17 @@ function wait(ms) {
     console.log('result: ', result);
     // console.log('result[0]: ', result[0]);
     
-    // await browser.close();
+    var file = path.join(__dirname, 'monster-india.json'); 
+    var content = JSON.stringify(result);
+    
+    fs.writeFile(file, content, function(err) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log('文件创建成功，地址：' + file);
+    });
+
+    await browser.close();
 })()
 
 async function getJobDetail(page) {

@@ -83,8 +83,8 @@ function wait(ms) {
         }
 
         console.log('result.length: ', result.length);
-        BASE_URL = BASE_URL.replace('-' + currentJobCount.toString(), '-' + (currentJobCount + 20).toString());
-        currentJobCount = currentJobCount + 20;
+        BASE_URL = BASE_URL.replace('-' + currentJobCount.toString(), '-' + (currentJobCount + 1).toString());
+        currentJobCount = currentJobCount + 1;
         await page.goto(BASE_URL, {
             waitUntil: 'networkidle2',
             timeout: 0
@@ -121,6 +121,16 @@ function wait(ms) {
     console.log('result: ', result);
     // console.log('result[0]: ', result[0]);
     
+    var file = path.join(__dirname, 'naukri.json'); 
+    var content = JSON.stringify(result);
+    
+    fs.writeFile(file, content, function(err) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log('文件创建成功，地址：' + file);
+    });
+
     await browser.close();
 })()
 

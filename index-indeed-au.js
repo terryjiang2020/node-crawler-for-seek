@@ -32,7 +32,7 @@ let jobs = [];
 
     console.log('jobs: ', jobs);
 
-    var file = path.join(__dirname, 'test.json'); 
+    var file = path.join(__dirname, 'indeed-au.json'); 
     var content = JSON.stringify(jobs);
     
     fs.writeFile(file, content, function(err) {
@@ -126,7 +126,7 @@ async function jobLoader(url, index) {
             }
         }
     })
-    jobs[index].description = $('#jobDescriptionText').eq(0).text().trim();
+    jobs[index].description = $('#jobDescriptionText').eq(0).html();
 
     console.log('jobs[index].email: ', jobs[index].email);
     console.log('jobs[index].description: ', jobs[index].description);
