@@ -14,7 +14,7 @@ const sleep = require('sleep');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'developer';
+const keywords = 'react+js';
 const BASE_URL = 'https://au.indeed.com/jobs?q=' + keywords + '&fromage=14';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {

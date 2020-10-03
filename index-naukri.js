@@ -6,6 +6,8 @@
 
 // 引入需要的工具包
 const puppeteer = require('puppeteer');
+const request = require('request');
+const fs = require('fs');
 
 const path = require('path');
 // 定义请求的URL地址
