@@ -14,7 +14,7 @@ const sleep = require('sleep');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'title%3A(react%20js)';
+const keywords = 'react%20js';
 const BASE_URL = 'https://au.indeed.com/jobs?q=' + keywords + '&fromage=14';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
@@ -31,6 +31,8 @@ let jobs = [];
     await pageLoader(BASE_URL);
 
     console.log('jobs: ', jobs);
+
+    console.log('jobs.length: ', jobs.length);
 
     var file = path.join(__dirname, 'indeed-au-react.json'); 
     var content = JSON.stringify(jobs);
@@ -91,7 +93,21 @@ function getJobInfo($, t) {
     const time = $(t).find('div.jobsearch-SerpJobCard-footer div.jobsearch-SerpJobCard-footerActions div.result-link-bar-container span.date').eq(0).text();
     const location = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[1];
     const area = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[0];
-    if (link && name && name.toLowerCase().includes('react') && !name.toLowerCase().includes('ios') && !name.toLowerCase().includes('android') && !name.toLowerCase().includes('mobile')) {
+    if (link && name && 
+        (
+            (
+                !name.toLowerCase().includes('php') && 
+                !name.toLowerCase().includes('python') && 
+                !name.toLowerCase().includes('java')
+            ) || (
+                name.toLowerCase().includes('react') && 
+                !name.toLowerCase().includes('native') 
+            )
+        ) && 
+        !name.toLowerCase().includes('ios') && 
+        !name.toLowerCase().includes('android') && 
+        !name.toLowerCase().includes('mobile')
+    ) {
         let info = {
             link: 'https://au.indeed.com' + link,
             name: name,

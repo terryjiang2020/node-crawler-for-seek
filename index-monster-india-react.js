@@ -23,18 +23,6 @@ var BASE_URL = 'https://www.monsterindia.com/srp/results?start=0&sort=2&limit=10
 //     'Accept':'application/json'
 // }
 
-let jobs = [];
-// 下載圖片
-var download = function(uri, filename, callback) {
-    request.head(uri, function(err, res, body) {
-        request(uri)
-            .pipe(fs.createWriteStream(__dirname + `/${filename}`))
-            .on('close', function() {
-                console.log('Finished Copy Images')
-            })
-    })
-}
-
 // 等一下
 function wait(ms) {
     return new Promise(resolve => setTimeout(() => resolve(), ms))
@@ -289,7 +277,22 @@ async function getJobInfo(page) {
                 area: null,
                 country: 'India'
             }
-            if (res.link && res.name && res.name.toLowerCase().includes('react') && !name.toLowerCase().includes('ios') && !name.toLowerCase().includes('android') && !name.toLowerCase().includes('mobile')) {
+
+            if (res.link && res.name && 
+                (
+                    (
+                        !res.name.toLowerCase().includes('php') && 
+                        !res.name.toLowerCase().includes('python') && 
+                        !res.name.toLowerCase().includes('java')
+                    ) || (
+                        res.name.toLowerCase().includes('react') && 
+                        !res.name.toLowerCase().includes('native') 
+                    )
+                ) && 
+                !res.name.toLowerCase().includes('ios') && 
+                !res.name.toLowerCase().includes('android') && 
+                !res.name.toLowerCase().includes('mobile')
+            ) {                
                 result.push(res);
             }
             if (i === info.companyNames.length - 1) {
