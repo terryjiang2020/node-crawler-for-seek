@@ -13,7 +13,7 @@ const path = require('path');
 // 定义请求的URL地址
 // const BASE_URL = 'http://www.23us.so';
 // const keywords = 'developer-jobs';
-const keywords = 'React%20Js,Node%20Js';
+const keywords = 'React%2CJs';
 var BASE_URL = 'https://www.monsterindia.com/srp/results?start=0&sort=2&limit=100&query=' + keywords + '&jobFreshness=15&filter=true';
 // const personal_token = 'token f6ee808fd4548d96253418d00d6dee4def13a8ae';
 // const headers = {
@@ -164,7 +164,7 @@ function wait(ms) {
     console.log('result: ', result);
     // console.log('result[0]: ', result[0]);
     
-    var file = path.join(__dirname, 'monster-india.json'); 
+    var file = path.join(__dirname, 'monster-india-react.json'); 
     var content = JSON.stringify(result);
     
     fs.writeFile(file, content, function(err) {
@@ -289,7 +289,9 @@ async function getJobInfo(page) {
                 area: null,
                 country: 'India'
             }
-            result.push(res);
+            if (res.link && res.name && res.name.toLowerCase().includes('react')) {
+                result.push(res);
+            }
             if (i === info.companyNames.length - 1) {
                 break;
             }
