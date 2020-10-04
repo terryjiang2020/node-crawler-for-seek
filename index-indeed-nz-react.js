@@ -91,7 +91,7 @@ function getJobInfo($, t) {
     const time = $(t).find('div.jobsearch-SerpJobCard-footer div.jobsearch-SerpJobCard-footerActions div.result-link-bar-container span.date').eq(0).text();
     const location = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[1];
     const area = $(t).find('div.sjcl .location.accessible-contrast-color-location').eq(0).text().split(', ')[0];
-    if (link && name && name.toLowerCase().includes('react')) {
+    if (link && name && name.toLowerCase().includes('react') && !name.toLowerCase().includes('ios') && !name.toLowerCase().includes('android') && !name.toLowerCase().includes('mobile')) {
         let info = {
             link: 'https://nz.indeed.com' + link,
             name: name,

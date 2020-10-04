@@ -289,7 +289,7 @@ async function getJobInfo(page) {
                 area: null,
                 country: 'India'
             }
-            if (res.link && res.name && res.name.toLowerCase().includes('node')) {
+            if (res.link && res.name && res.name.toLowerCase().includes('node') && !name.toLowerCase().includes('ios') && !name.toLowerCase().includes('android') && !name.toLowerCase().includes('mobile')) {
                 result.push(res);
             }
             if (i === info.companyNames.length - 1) {
