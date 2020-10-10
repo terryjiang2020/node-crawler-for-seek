@@ -98,7 +98,9 @@ function getJobInfo($, t) {
             (
                 !name.toLowerCase().includes('php') && 
                 !name.toLowerCase().includes('python') && 
-                !name.toLowerCase().includes('java')
+                !name.toLowerCase().includes('java') && 
+                !name.toLowerCase().includes('angular') && 
+                !name.toLowerCase().includes('vue')
             ) || (
                 name.toLowerCase().includes('node') 
             )

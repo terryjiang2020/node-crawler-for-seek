@@ -283,7 +283,9 @@ async function getJobInfo(page) {
                     (
                         !res.name.toLowerCase().includes('php') && 
                         !res.name.toLowerCase().includes('python') && 
-                        !res.name.toLowerCase().includes('java')
+                        !res.name.toLowerCase().includes('java') && 
+                        !res.name.toLowerCase().includes('angular') && 
+                        !res.name.toLowerCase().includes('vue')
                     ) || (
                         res.name.toLowerCase().includes('react') && 
                         !res.name.toLowerCase().includes('native') 
