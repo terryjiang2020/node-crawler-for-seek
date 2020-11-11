@@ -18,13 +18,27 @@ let jobs = [];
 // 1. 发送请求，获取HTML字符串
 (async () => {
 
-    fetchRemoteJobsFromRemoteOk();
+    // fetchRemoteJobsFromRemoteOk();
 
     // await pageLoader(BASE_URL);
 
+    var file = path.join(__dirname, 'remote-ok.json'); 
+    
+    fs.readFile(file, async function(err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        let array = JSON.parse(data);
+        console.log('array: ', array);
+        for (let i = 0; i < array.length; i++) {
+            console.log('i: ', i);
+            await jobLoader(array[i].url, i);
+        }
+        // console.log('文件创建成功，地址：' + file);
+    });
+
     // console.log('jobs: ', jobs);
 
-    // var file = path.join(__dirname, 'seek.json'); 
     // var content = JSON.stringify(jobs);
     
     // fs.writeFile(file, content, function(err) {
@@ -67,7 +81,7 @@ async function pageLoader(url) {
     }
     else {
         for (let i = 0; i < jobs.length; i++) {
-            await jobLoader(jobs[i].link, i);
+            setTimeout(() => {return jobLoader(jobs[i].link, i)}, 1000 * i);
             if (i === jobs.length - 1) {
                 break;
             }
@@ -81,59 +95,61 @@ async function pageLoader(url) {
 
 function fetchRemoteJobsFromRemoteOk() {
     console.log('fetchRemoteJobsFromRemoteOk is triggered');
-    var optionsget = {
-        host : 'remoteok.io', // here only the domain name
-        // (no http/https !)
-        port : 443,
-        path : '/api', // the rest of the url with parameters if needed
-        method : 'GET', // do GET
-    };
+    // var optionsget = {
+    //     host : 'remoteok.io', // here only the domain name
+    //     // (no http/https !)
+    //     port : 443,
+    //     path : '/api', // the rest of the url with parameters if needed
+    //     method : 'GET', // do GET
+    // };
 
-    console.info('Options prepared:');
-    console.info(optionsget);
-    console.info('Do the GET call');
+    // console.info('Options prepared:');
+    // console.info(optionsget);
+    // console.info('Do the GET call');
 
-    // do the GET request
-    var reqGet = https.request(optionsget, function(res) {
-        console.log("statusCode: ", res.statusCode);
-        // uncomment it for header details
-        console.log("headers: ", res.headers);
-        var body = '';
-        res.on('data', function(d) {
-            console.info('GET result:\n', d);
-            process.stdout.write(d);
-            body += d;
-            console.info('\n\nCall completed');
-            console.log('d: ', d);
-        });
+    // // do the GET request
+    // var reqGet = https.request(optionsget, function(res) {
+    //     console.log("statusCode: ", res.statusCode);
+    //     // uncomment it for header details
+    //     console.log("headers: ", res.headers);
+    //     var body = '';
+    //     res.on('data', function(d) {
+    //         console.info('GET result:\n', d);
+    //         process.stdout.write(d);
+    //         body += d;
+    //         console.info('\n\nCall completed');
+    //         console.log('d: ', d);
+    //     });
 
-        res.on('end', () => {
-            // console.log('body: ', body);
-            // const json = JSON.parse(body).json;
-            // console.log('json: ', json);
-            body = eval(body);
-            console.log('Array.isArray(body): ', Array.isArray(body));
-            console.log('body: ', body);
-            if (res.statusCode === 200) {
-                console.log('success');
-                jobs = body;
-                for (let i = 0; i < jobs.length; i++) {
-                    jobLoader(jobs[i].url, i);
-                    if (i === jobs.length - 1) {
-                        break;
-                    }
-                }
-                console.log('new jobs: ', jobs);
-            }
-        })
-        console.log('res: ', res);
+    //     res.on('end', () => {
+    //         // console.log('body: ', body);
+    //         // const json = JSON.parse(body).json;
+    //         // console.log('json: ', json);
+    //         body = eval(body);
+    //         console.log('Array.isArray(body): ', Array.isArray(body));
+    //         console.log('body: ', body);
+    //         if (res.statusCode === 200) {
+    //             console.log('success');
+    //             jobs = body;
+    //             for (let i = 0; i < jobs.length; i++) {
+    //                 if (jobs[i].url) {
+    //                     jobLoader(jobs[i].url, i);
+    //                 }
+    //                 if (i === jobs.length - 1) {
+    //                     break;
+    //                 }
+    //             }
+    //             console.log('new jobs: ', jobs);
+    //         }
+    //     })
+    //     console.log('res: ', res);
         
-    });
+    // });
     
-    reqGet.end();
-    reqGet.on('error', function(e) {
-        console.error('Error occurs: ', e);
-    });
+    // reqGet.end();
+    // reqGet.on('error', function(e) {
+    //     console.error('Error occurs: ', e);
+    // });
 }
 
 function getJobInfo($, t) {
@@ -161,34 +177,36 @@ function getJobInfo($, t) {
 }
 
 async function jobLoader(url, index) {
-    let html = await sp.get(url);
-
-    console.log('html: ', html);
-  
-    // // 2. 将字符串导入，使用cheerio获取元素
-    // let $ = cheerio.load(html.text);
+    setTimeout(async () => {
+        let html = await sp.get(url);
     
-    // // 3. 获取指定的元素
-    // $('.Ne1m3o8').each(function () {
-    //     if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
-    //         const email = $(this).eq(0).attr('href').split(':')[1];
-    //         if (email) {
-    //             jobs[index].email = email;
-    //         }
-    //         else {
-    //             jobs[index].email = null;
-    //         }
-    //     }
-    // })
+        // console.log('html: ', html);
+      
+        // 2. 将字符串导入，使用cheerio获取元素
+        // let $ = cheerio.load(html.text);
+        
+        // 3. 获取指定的元素
+        // $('.description').each(function () {
+        //     if ($(this).eq(0).attr('href') && $(this).eq(0).attr('href').split(':').length !== 0) {
+        //         const email = $(this).eq(0).attr('href').split(':')[1];
+        //         if (email) {
+        //             jobs[index].email = email;
+        //         }
+        //         else {
+        //             jobs[index].email = null;
+        //         }
+        //     }
+        // })
+    
+        // const description = $('.description').eq(0).html();
+        // if (description) {
+        //     jobs[index].description = description;
+        // } else {
+        //     jobs[index].description = null;
+        // }
+    }, 3000 * index);
 
-    // const description = $('div').data('automation', 'jobDescription').eq(0).html();
-    // if (description) {
-    //     jobs[index].description = description;
-    // } else {
-    //     jobs[index].description = null;
-    // }
-
-    // return jobs;
+    return jobs;
 }
 
 
