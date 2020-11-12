@@ -46,6 +46,7 @@ let jobs = [];
         }
         let array = JSON.parse(data);
         console.log('array: ', array);
+        array.splice(0, 1);
         jobs = array;
         for (let i = 0; i < jobs.length; i++) {
             console.log('i: ', i);
