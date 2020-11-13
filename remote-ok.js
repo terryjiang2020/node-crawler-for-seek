@@ -27,6 +27,10 @@ const BASE_URL = 'https://au.indeed.com/jobs?q=' + keywords + '&fromage=14';
 // }
 
 let jobs = [];
+
+let keyword_array = [
+    'full stack', 'frontend', 'backend', 'react', 'react native', 'javascript', 'angular', 'angularjs', 'java', 'dev', 'vuejs', 'vue', 'bootstrap', 'graphql', 'software engineering', 'go', 'golang', 'typescript', 'rest apis', 'node', 'nodejs', 'reactjs', 'php', 'developer', 'wordpress', 'fullstack', 'django', 'redux', 'rails', 'postgres', 'mysql', 'redis', 'ruby', 'python', 'mongodb', 'front end', 'back end', 'scala', 'kotlin', 'html', 'python django', 'django', 'ruby on rails', 'c plus plus', 'dot net', 'devops', 'css', 'c#', 'html/css', 'spring', 'front-end', 'back-end', 'full-stack', 'jquery', 'sql', 'c sharp', 'perl', 'nosql', 'qa', 'quality assurance', 'programming', 'testing', 'manual_testing', 'manual testing', 'testing code', 'automation', 'swift', 'web', 'shopify', 'wordpress', 'emberjs', 'ember js', 'delphi', 'elm', 'mssql', 'ms sql', '.net', 'objectivec', 'objective c', 'objective-c', 'oracle', 'rust', 'visual basic'
+];
 // 1. 发送请求，获取HTML字符串
 (async () => {
 
@@ -50,18 +54,20 @@ let jobs = [];
         jobs = array;
         for (let i = 0; i < jobs.length; i++) {
             console.log('i: ', i);
-            sleep.sleep(2);
-            // await jobLoader(jobs[i].url, i);
-            await page.goto(jobs[i].url, {
-                waitUntil: 'networkidle2',
-                timeout: 0
-            }) // your url here
-        
-            const description = await getJobDetail(page);
-
-            jobs[i].description = description;
-
-            console.log('jobs[i].description: ', jobs[i].description);
+            if (jobs[i].tags.filter(value => keyword_array.includes(value)).length !== 0) {
+                sleep.sleep(2);
+                // await jobLoader(jobs[i].url, i);
+                await page.goto(jobs[i].url, {
+                    waitUntil: 'networkidle2',
+                    timeout: 0
+                }) // your url here
+            
+                const description = await getJobDetail(page);
+    
+                jobs[i].description = description;
+    
+                console.log('jobs[i].description: ', jobs[i].description);
+            }
 
             if (i === jobs.length - 1) {
                 break;
