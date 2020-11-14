@@ -67,7 +67,7 @@ let keyword_array = [
                 const applyLink = await getJobApplyLink(page);
 
                 jobs[i].description = description;
-                jobs[i].applyLink = applyLink;
+                jobs[i].apply_link = applyLink;
                 jobs[i].tags = distinct(jobs[i].tags);
                 jobs[i].tags = replace(jobs[i].tags);
                 jobs[i].tags = distinct(jobs[i].tags);
@@ -238,7 +238,10 @@ async function getJobDetail(page) {
 async function getJobApplyLink(page) {
     console.log('getJobApplyLink is triggered');
     return await page.evaluate(() => {
-        const applyLink = Array.from(document.querySelectorAll('a.no-border.tooltip')).map(a => a.href)[0];
+        var applyLink = Array.from(document.querySelectorAll('a.no-border.tooltip')).map(a => a.href)[0];
+        if (!applyLink) {
+            applyLink = null;
+        }
         console.log('applyLink: ', applyLink);
         return applyLink;
     })
