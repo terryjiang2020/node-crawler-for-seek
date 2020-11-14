@@ -52,6 +52,7 @@ let keyword_array = [
         console.log('array: ', array);
         array.splice(0, 1);
         jobs = array;
+        filtered_jobs = [];
         for (let i = 0; i < jobs.length; i++) {
             console.log('i: ', i);
             if (jobs[i].tags.filter(value => keyword_array.includes(value)).length !== 0) {
@@ -63,10 +64,15 @@ let keyword_array = [
                 }) // your url here
             
                 const description = await getJobDetail(page);
-    
+                const applyLink = await getJobApplyLink(page);
+
                 jobs[i].description = description;
-    
+                jobs[i].applyLink = applyLink;
+                jobs[i].tags = distinct(jobs[i].tags);
+                jobs[i].tags = replace(jobs[i].tags);
+                jobs[i].tags = distinct(jobs[i].tags);
                 console.log('jobs[i].description: ', jobs[i].description);
+                filtered_jobs.push(jobs[i]);
             }
 
             if (i === jobs.length - 1) {
@@ -74,12 +80,12 @@ let keyword_array = [
             }
         }
 
-        console.log('jobs: ', jobs);
+        console.log('filtered_jobs: ', filtered_jobs);
 
-        console.log('jobs.length: ', jobs.length);
+        console.log('filtered_jobs.length: ', filtered_jobs.length);
 
         var file = path.join(__dirname, 'remote-ok-new.json'); 
-        var content = JSON.stringify(jobs);
+        var content = JSON.stringify(filtered_jobs);
         
         fs.writeFile(file, content, function(err) {
             if (err) {
@@ -93,13 +99,148 @@ let keyword_array = [
     });
 })()
 
+function distinct(a) {
+    console.log('distinct is triggered');
+    let arr = a;
+    let result = []
+    let obj = {}
+
+    for (let i of arr) {
+        if (!obj[i]) {
+            result.push(i)
+            obj[i] = 1
+        }
+    }
+
+    return result;
+}
+
+tag_alternatives_array = [
+    {
+        origin: 'fullstack', 
+        alternative: ['full stack', 'full-stack']
+    },
+    {
+        origin: 'frontend', 
+        alternative: ['front end', 'front-end']
+    },
+    {
+        origin: 'backend', 
+        alternative: ['back end', 'back-end']
+    },
+    {
+        origin: 'react.js', 
+        alternative: ['react', 'reactjs', 'react-js']
+    },
+    {
+        origin: 'react native', 
+        alternative: ['react-native', 'reactnative']
+    },
+    {
+        origin: 'javascript', 
+        alternative: ['js']
+    },
+    {
+        origin: 'angular.js', 
+        alternative: ['angularjs']
+    }, 
+    {
+        origin: 'vue.js', 
+        alternative: ['vuejs', 'vue']
+    }, 
+    {
+        origin: 'golang', 
+        alternative: ['go']
+    },
+    {
+        origin: 'node.js', 
+        alternative: ['nodejs', 'node', 'node js']
+    },
+    {
+        origin: 'c++', 
+        alternative: ['c plus plus', 'c-plus-plus']
+    }, 
+    {
+        origin: 'c#', 
+        alternative: ['c sharp', 'c-sharp']
+    }, 
+    {
+        origin: 'django', 
+        alternative: ['python django']
+    },
+    {
+        origin: '.net', 
+        alternative: ['dot net']
+    },
+    {
+        origin: 'manual testing', 
+        alternative: ['manual_testing']
+    },
+    {
+        origin: 'ember.js', 
+        alternative: ['emberjs', 'ember js', 'ember']
+    },
+    {
+        origin: 'mssql', 
+        alternative: ['ms sql']
+    }, 
+    {
+        origin: 'objective c',
+        alternative: ['objectivec', 'objective-c']
+    },
+    {
+        origin: 'visual basic', 
+        alternative: ['visual-basic', 'visualbasic']
+    },
+    {
+        origin: 'postgres', 
+        alternative: ['postgresql']
+    }
+]
+
+function replace(a) {
+    console.log('replace is triggered');
+
+    for (let x = 0; x < tag_alternatives_array.length; x++) {
+        const origin = tag_alternatives_array[x].origin;
+        for (let y = 0; y < tag_alternatives_array[x].alternative.length; y++) {
+            const alternative = tag_alternatives_array[x].alternative[y];
+            if (a.findIndex(m => m === origin) !== -1) {
+                if (a.findIndex(x => x === alternative) !== -1) {
+                    a.splice(a.findIndex(x => x === alternative), 1);
+                }
+            }
+            else {
+                if (a.findIndex(x => x === alternative) !== -1) {
+                    a.splice(a.findIndex(x => x === alternative), 1, origin);
+                }
+            }
+            if (y === tag_alternatives_array[x].alternative.length - 1) {
+                break;
+            }
+        }
+        if (x === tag_alternatives_array.length - 1) {
+            break;
+        }
+    }
+    return a;
+}
+
 async function getJobDetail(page) {
     console.log('getJobDetail is triggered');
     return await page.evaluate(() => {
         const description = Array.from(document.querySelectorAll('div.markdown')).map(p => p.innerHTML)[0];
-        // jobs[i].description = description;
         console.log('description: ', description);
         return description;
+    })
+}
+
+async function getJobApplyLink(page) {
+    console.log('getJobApplyLink is triggered');
+    return await page.evaluate(() => {
+        const applyLink = Array.from(document.querySelectorAll('a.no-border.tooltip')).map(a => a.href)[0];
+        console.log('applyLink: ', applyLink);
+        return applyLink;
     })
 }
 
