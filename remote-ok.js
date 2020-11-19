@@ -72,7 +72,9 @@ let keyword_array = [
                 jobs[i].tags = replace(jobs[i].tags);
                 jobs[i].tags = distinct(jobs[i].tags);
                 console.log('jobs[i].description: ', jobs[i].description);
-                filtered_jobs.push(jobs[i]);
+                if (jobs[i].description && jobs[i].description !== '' && jobs[i].company && jobs[i].company !== '') {
+                    filtered_jobs.push(jobs[i]);
+                }
             }
 
             if (i === jobs.length - 1) {
