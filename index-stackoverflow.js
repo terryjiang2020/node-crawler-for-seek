@@ -132,15 +132,17 @@ function getJobInfo($, t) {
     const date_number = parseInt(time.replace(date_unit, ''));
     if (date_unit === 'm ago') {
         date = new Date(new Date().setMinutes(new Date().getMinutes() - parseInt(date_number)));
-    }
+    } else 
     if (date_unit === 'h ago') {
         date = new Date(new Date().setHours(new Date().getHours() - parseInt(date_number)));
-    }
+    } else 
     if (date_unit === 'd ago') {
         date = new Date(new Date().setDate(new Date().getDate() - parseInt(date_number)));
-    }
+    } else 
     if (date_unit === 'yesterday' || date_unit === 'Yesterday') {
         date = new Date(new Date().setDate(new Date().getDate() - 1));
+    } else {
+        date = new Date();
     }
     console.log('date: ', date);
     
@@ -217,7 +219,7 @@ async function jobLoader(url, index) {
         console.log("$('div#overview-items section.mb32').eq(i).html(): ", $('div#overview-items section.mb32').eq(i).html());
         console.log("$('div#overview-items section.mb32').eq(i).children().first().text(): ", $('div#overview-items section.mb32').eq(i).children().first().text());
         const title = $('div#overview-items section.mb32').eq(i).children().first().text();
-        const content = $('div#overview-items section.mb32').eq(i).html();
+        const content = $('div#overview-items section.mb32').eq(i).html().replace(/\n/g, '').replace(/<h2 class=\"fs-subheading mb16 fc-dark\">/g, '<br><h2 class=\"fs-subheading mb16 fc-dark\">').replace(/<\/h2>/g, '</h2><br></br>');
         if (title !== 'Technologies') {
             description += content;
         }
