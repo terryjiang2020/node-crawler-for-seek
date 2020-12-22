@@ -49,13 +49,15 @@ let keyword_array = [
             return console.log(err);
         }
         let array = JSON.parse(data);
-        console.log('array: ', array);
+        // console.log('array: ', array);
         array.splice(0, 1);
         jobs = array;
         filtered_jobs = [];
         for (let i = 0; i < jobs.length; i++) {
             console.log('i: ', i);
-            if (jobs[i].tags.filter(value => keyword_array.includes(value)).length !== 0) {
+            // console.log('jobs[i]: ', jobs[i]);
+            console.log('jobs[i].tags: ', jobs[i].tags);
+            if (Array.isArray(jobs[i].tags) && jobs[i].tags.filter(value => keyword_array.includes(value)).length !== 0) {
                 sleep.sleep(2);
                 // await jobLoader(jobs[i].url, i);
                 await page.goto(jobs[i].url, {
@@ -71,6 +73,26 @@ let keyword_array = [
                 jobs[i].tags = distinct(jobs[i].tags);
                 jobs[i].tags = replace(jobs[i].tags);
                 jobs[i].tags = distinct(jobs[i].tags);
+                console.log('jobs[i].description: ', jobs[i].description);
+                if (jobs[i].description && jobs[i].description !== '' && jobs[i].company && jobs[i].company !== '') {
+                    filtered_jobs.push(jobs[i]);
+                }
+            }
+            else {
+                
+                sleep.sleep(2);
+                // await jobLoader(jobs[i].url, i);
+                await page.goto(jobs[i].url, {
+                    waitUntil: 'networkidle2',
+                    timeout: 0
+                }) // your url here
+            
+                const description = await getJobDetail(page);
+                const applyLink = await getJobApplyLink(page);
+
+                jobs[i].description = description;
+                jobs[i].apply_link = applyLink;
+                jobs[i].tags = [];
                 console.log('jobs[i].description: ', jobs[i].description);
                 if (jobs[i].description && jobs[i].description !== '' && jobs[i].company && jobs[i].company !== '') {
                     filtered_jobs.push(jobs[i]);
